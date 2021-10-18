@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/riferrei/srclient"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -20,8 +19,6 @@ var schemaRegistryUrl string
 // If `f` throws a panic it will be caught and handled
 //
 func Consume(f func(*kafka.Message)) {
-	godotenv.Load()
-
 	MaxPollInt := os.Getenv("KAFKA_MAX_POLL_INTERVAL")
 	if MaxPollInt == "" {
 		MaxPollInt = "300000"
