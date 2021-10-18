@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/riferrei/srclient"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -19,6 +20,8 @@ var schemaRegistryUrl string
 // If `f` throws a panic it will be caught and handled
 //
 func Consume(f func(*kafka.Message)) {
+	godotenv.Load()
+
 	MaxPollInt := os.Getenv("KAFKA_MAX_POLL_INTERVAL")
 	if MaxPollInt == "" {
 		MaxPollInt = "300000"
@@ -73,7 +76,7 @@ func Consume(f func(*kafka.Message)) {
 		schemaRegistryUsername := os.Getenv("KAFKA_SCHEMA_REGISTRY_USERNAME")
 		schemaRegistryPassword := os.Getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD")
 		if schemaRegistryUsername != "" && schemaRegistryPassword != "" {
-			schemaRegistryClient.SetCredentials(schemaRegistryUsername,schemaRegistryPassword)
+			schemaRegistryClient.SetCredentials(schemaRegistryUsername, schemaRegistryPassword)
 		}
 	}
 
