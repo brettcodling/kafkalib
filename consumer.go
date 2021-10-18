@@ -115,7 +115,6 @@ func processMessage(msg *kafka.Message, f func(*kafka.Message)) {
 		}
 	}()
 
-	fmt.Printf("schemaRegistryUrl: %s\n", schemaRegistryUrl)
 	if schemaRegistryUrl != "" {
 		decodeMessageValue(msg)
 	}
