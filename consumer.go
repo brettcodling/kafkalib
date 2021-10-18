@@ -108,6 +108,8 @@ func decodeMessageValue(msg *kafka.Message) {
 	msg.Value = value
 }
 
+// processMessage will dispatch a worker that calls `f`
+// It will also handle any panics that it throws
 func processMessage(msg *kafka.Message, f func(*kafka.Message)) {
 	defer func() {
 		if err := recover(); err != nil {
