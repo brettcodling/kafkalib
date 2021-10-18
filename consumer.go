@@ -20,7 +20,10 @@ var schemaRegistryUrl string
 // If `f` throws a panic it will be caught and handled
 //
 func Consume(f func(*kafka.Message)) {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
 
 	MaxPollInt := os.Getenv("KAFKA_MAX_POLL_INTERVAL")
 	if MaxPollInt == "" {
