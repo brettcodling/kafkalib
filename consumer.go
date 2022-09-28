@@ -135,7 +135,7 @@ func processMessage(msg *kafka.Message, f func(*kafka.Message)) {
 
 // Parse the kafka message value from json to a struct
 func ParseKafkaMsg(msg *kafka.Message) (value interface{}, err error) {
-	err := json.Unmarshal(msg.Value, &value)
+	err = json.Unmarshal(msg.Value, &value)
 
 	return
 }
