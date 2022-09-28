@@ -1,4 +1,4 @@
-module github.com/brettcodling/kafkalib
+module kafkalib
 
 go 1.19
 
