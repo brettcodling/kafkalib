@@ -2,6 +2,7 @@ package kafkalib
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -129,4 +130,11 @@ func processMessage(msg *kafka.Message, f func(*kafka.Message)) {
 
 	fmt.Println("Calling function with kafka message")
 	go f(msg)
+}
+
+// Parse the kafka message value from json to a struct
+func ParseKafkaMsg(msg *kafka.Message, value interface{}) (interface{}, error) {
+	err := json.Unmarshal(msg.Value, &value)
+
+	return value, err
 }

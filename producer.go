@@ -8,18 +8,23 @@ import (
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
+var producer *kafka.Producer
+
 // Produce will produce a message to the kafka topic
-func Produce(topic string, msg string) {
+func Produce(topic string, msg string) error {
 	godotenv.Load()
 
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": os.Getenv("KAFKA_BROKER_URL")})
-	if err != nil {
-		panic(err)
+	if producer.String() == "" {
+		var err error
+		producer, err = kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": os.Getenv("KAFKA_BROKER_URL")})
+		if err != nil {
+			return err
+		}
 	}
 
 	// Delivery report handler for produced messages
 	go func() {
-		for e := range p.Events() {
+		for e := range producer.Events() {
 			switch ev := e.(type) {
 			case *kafka.Message:
 				if ev.TopicPartition.Error != nil {
@@ -32,11 +37,13 @@ func Produce(topic string, msg string) {
 	}()
 
 	// Produce messages to topic (asynchronously)
-	p.Produce(&kafka.Message{
+	producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          []byte(msg),
 	}, nil)
 
 	// Wait for message deliveries before shutting down
-	p.Flush(15 * 1000)
+	producer.Flush(15 * 1000)
+
+	return nil
 }
