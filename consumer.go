@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -23,7 +24,7 @@ var schemaRegistryUrl string
 func Consume(f func(*kafka.Message)) {
 	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	MaxPollInt := os.Getenv("KAFKA_MAX_POLL_INTERVAL")
@@ -59,23 +60,23 @@ func Consume(f func(*kafka.Message)) {
 		cm.SetKey("group.id", GroupId)
 	}
 
-	fmt.Println("Creating consumer")
+	log.Println("Creating consumer")
 	c, err := kafka.NewConsumer(&cm)
-	fmt.Printf("brokerUrl: %s\n", cm["bootstrap.servers"])
+	log.Printf("brokerUrl: %s\n", cm["bootstrap.servers"])
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	defer c.Close()
 
 	c.SubscribeTopics([]string{os.Getenv("KAFKA_TOPIC")}, nil)
 
-	fmt.Println("Subscribed to topics")
+	log.Println("Subscribed to topics")
 
 	schemaRegistryUrl = os.Getenv("KAFKA_SCHEMA_REGISTRY_URL")
 	if schemaRegistryUrl != "" {
-		fmt.Println("Creating schema registry client")
+		log.Println("Creating schema registry client")
 		schemaRegistryClient = srclient.CreateSchemaRegistryClient(os.Getenv("KAFKA_SCHEMA_REGISTRY_URL"))
 		schemaRegistryUsername := os.Getenv("KAFKA_SCHEMA_REGISTRY_USERNAME")
 		schemaRegistryPassword := os.Getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD")
@@ -84,14 +85,14 @@ func Consume(f func(*kafka.Message)) {
 		}
 	}
 
-	fmt.Println("Listening for messages")
+	log.Println("Listening for messages")
 
 	for {
 		msg, err := c.ReadMessage(-1)
-		fmt.Println("New message received")
+		log.Println("New message received")
 		if err != nil {
 			// The client will automatically try to recover from all errors.
-			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
+			log.Printf("Consumer error: %v (%v)\n", err, msg)
 			continue
 		}
 		processMessage(msg, f)
@@ -102,7 +103,7 @@ func Consume(f func(*kafka.Message)) {
 // schema registry based on environment variables
 func decodeMessageValue(msg *kafka.Message) {
 	if cap(msg.Value) < 6 {
-		fmt.Printf("Failed to get schema id from message: %s\n", string(msg.Value))
+		log.Printf("Failed to get schema id from message: %s\n", string(msg.Value))
 		return
 	}
 	schemaID := binary.BigEndian.Uint32(msg.Value[1:5])
@@ -120,7 +121,7 @@ func decodeMessageValue(msg *kafka.Message) {
 func processMessage(msg *kafka.Message, f func(*kafka.Message)) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("Panic occurred:", err)
+			log.Println("Panic occurred:", err)
 		}
 	}()
 
@@ -128,7 +129,7 @@ func processMessage(msg *kafka.Message, f func(*kafka.Message)) {
 		decodeMessageValue(msg)
 	}
 
-	fmt.Println("Calling function with kafka message")
+	log.Println("Calling function with kafka message")
 	go f(msg)
 }
 
