@@ -7,9 +7,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/joho/godotenv"
 	"github.com/riferrei/srclient"
-	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
 var schemaRegistryClient *srclient.SchemaRegistryClient

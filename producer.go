@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/joho/godotenv"
-	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
 var producer *kafka.Producer
