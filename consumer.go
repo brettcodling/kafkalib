@@ -24,7 +24,7 @@ var schemaRegistryUrl string
 func Consume(f func(*kafka.Message)) {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	MaxPollInt := os.Getenv("KAFKA_MAX_POLL_INTERVAL")
